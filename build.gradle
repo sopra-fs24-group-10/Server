@@ -62,7 +62,7 @@ sonarqube {
 }
 
 jacocoTestReport {
-    reports {S
+    reports {
         xml.enabled true
     }
 }
