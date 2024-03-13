@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/v1/auth/**").permitAll()
+                .antMatchers("/h2-console/**").permitAll() //TODO: Remove on deplay
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic();
