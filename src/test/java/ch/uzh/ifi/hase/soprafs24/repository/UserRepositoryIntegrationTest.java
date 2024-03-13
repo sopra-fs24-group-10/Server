@@ -31,7 +31,7 @@ public class UserRepositoryIntegrationTest {
   //   entityManager.persist(user);
   //   entityManager.flush();
 
-  //   // when
+  //   // when 
   //   UserEntity found = userRepository.findByName(user.getName());
 
   //   //then
