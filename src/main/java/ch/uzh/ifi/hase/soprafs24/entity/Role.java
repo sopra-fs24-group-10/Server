@@ -1,13 +1,11 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 import javax.persistence.*;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Setter
-@Getter
 @Entity
 @Table(name = "ROLES")
+@Data
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
