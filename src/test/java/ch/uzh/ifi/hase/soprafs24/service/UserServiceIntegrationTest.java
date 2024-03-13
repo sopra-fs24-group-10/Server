@@ -1,7 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.entity.UserEntity;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,18 +39,18 @@ public class UserServiceIntegrationTest {
     // given
     assertNull(userRepository.findByUsername("testUsername"));
 
-    User testUser = new User();
-    testUser.setName("testName");
+    UserEntity testUser = new UserEntity();
+    // testUser.setName("testName");
     testUser.setUsername("testUsername");
 
     // when
-    User createdUser = userService.createUser(testUser);
+    UserEntity createdUser = userService.createUser(testUser);
 
     // then
     assertEquals(testUser.getId(), createdUser.getId());
-    assertEquals(testUser.getName(), createdUser.getName());
+    // assertEquals(testUser.getName(), createdUser.getName());
     assertEquals(testUser.getUsername(), createdUser.getUsername());
-    assertNotNull(createdUser.getToken());
+    // assertNotNull(createdUser.getToken());
     assertEquals(UserStatus.OFFLINE, createdUser.getStatus());
   }
 
@@ -58,16 +58,16 @@ public class UserServiceIntegrationTest {
   public void createUser_duplicateUsername_throwsException() {
     assertNull(userRepository.findByUsername("testUsername"));
 
-    User testUser = new User();
-    testUser.setName("testName");
+    UserEntity testUser = new UserEntity();
+    // testUser.setName("testName");
     testUser.setUsername("testUsername");
-    User createdUser = userService.createUser(testUser);
+    UserEntity createdUser = userService.createUser(testUser);
 
     // attempt to create second user with same username
-    User testUser2 = new User();
+    UserEntity testUser2 = new UserEntity();
 
     // change the name but forget about the username
-    testUser2.setName("testName2");
+    // testUser2.setName("testName2");
     testUser2.setUsername("testUsername");
 
     // check that an error is thrown

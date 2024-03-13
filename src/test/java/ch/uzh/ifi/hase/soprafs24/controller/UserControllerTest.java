@@ -1,7 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.entity.UserEntity;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -46,12 +46,12 @@ public class UserControllerTest {
   @Test
   public void givenUsers_whenGetUsers_thenReturnJsonArray() throws Exception {
     // given
-    User user = new User();
-    user.setName("Firstname Lastname");
+    UserEntity user = new UserEntity();
+    //user.setName("Firstname Lastname");
     user.setUsername("firstname@lastname");
     user.setStatus(UserStatus.OFFLINE);
 
-    List<User> allUsers = Collections.singletonList(user);
+    List<UserEntity> allUsers = Collections.singletonList(user);
 
     // this mocks the UserService -> we define above what the userService should
     // return when getUsers() is called
@@ -63,7 +63,7 @@ public class UserControllerTest {
     // then
     mockMvc.perform(getRequest).andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0].name", is(user.getName())))
+        //.andExpect(jsonPath("$[0].name", is(user.getName())))
         .andExpect(jsonPath("$[0].username", is(user.getUsername())))
         .andExpect(jsonPath("$[0].status", is(user.getStatus().toString())));
   }
@@ -71,11 +71,11 @@ public class UserControllerTest {
   @Test
   public void createUser_validInput_userCreated() throws Exception {
     // given
-    User user = new User();
+    UserEntity user = new UserEntity();
     user.setId(1L);
-    user.setName("Test User");
+    //user.setName("Test User");
     user.setUsername("testUsername");
-    user.setToken("1");
+    //user.setToken("1");
     user.setStatus(UserStatus.ONLINE);
 
     UserPostDTO userPostDTO = new UserPostDTO();
@@ -93,7 +93,7 @@ public class UserControllerTest {
     mockMvc.perform(postRequest)
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id", is(user.getId().intValue())))
-        .andExpect(jsonPath("$.name", is(user.getName())))
+        //.andExpect(jsonPath("$.name", is(user.getName())))
         .andExpect(jsonPath("$.username", is(user.getUsername())))
         .andExpect(jsonPath("$.status", is(user.getStatus().toString())));
   }
