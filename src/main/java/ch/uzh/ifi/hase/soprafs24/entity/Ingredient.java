@@ -14,9 +14,7 @@ public class Ingredient {
 
     @Column(unique = true)
     private Long api_id;
-    
     private String name;
-    private String description;
     private String unit;
     private String image;
 }

@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.rest.mapper;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Event;
+import ch.uzh.ifi.hase.soprafs24.entity.Ingredient;
 import ch.uzh.ifi.hase.soprafs24.entity.Recipe;
 import ch.uzh.ifi.hase.soprafs24.entity.UserEntity;
 import ch.uzh.ifi.hase.soprafs24.entity.UserSetting;
@@ -9,6 +10,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.FavouriteDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.RegisterDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserSettingDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.external.ApiRecipeDTO;
 
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -27,35 +29,48 @@ import org.mapstruct.factory.Mappers;
 @Mapper
 public interface DTOMapper {
 
-  DTOMapper INSTANCE = Mappers.getMapper(DTOMapper.class);
+    DTOMapper INSTANCE = Mappers.getMapper(DTOMapper.class);
 
-  @Mapping(source = "username", target = "username")
-  @Mapping(source = "firstname", target = "firstname")
-  @Mapping(source = "lastname", target = "lastname")
-  @Mapping(source = "password", target = "password")
-  UserEntity convertRegisterDTOtoUserEntity(RegisterDTO registerDTO);
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "firstname", target = "firstname")
+    @Mapping(source = "lastname", target = "lastname")
+    @Mapping(source = "password", target = "password")
+    UserEntity convertRegisterDTOtoUserEntity(RegisterDTO registerDTO);
 
-  @Mapping(source = "id", target = "id")
-  @Mapping(source = "username", target = "username")
-  @Mapping(source = "firstname", target = "firstname")
-  @Mapping(source = "lastname", target = "lastname")
-  UserDTO convertUserEntityToUserDTO(UserEntity userEntity);
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "firstname", target = "firstname")
+    @Mapping(source = "lastname", target = "lastname")
+    UserDTO convertUserEntityToUserDTO(UserEntity userEntity);
 
-  @Mapping(source = "design", target = "design")
-  @Mapping(source = "view", target = "view")
-  UserSettingDTO convertUserSettingToUserSettingDTO(UserSetting userSetting);
+    @Mapping(source = "design", target = "design")
+    @Mapping(source = "view", target = "view")
+    UserSettingDTO convertUserSettingToUserSettingDTO(UserSetting userSetting);
 
-  @Mapping(source = "id", target = "id")
-  @Mapping(source = "api_id", target = "api_id")
-  @Mapping(source = "name", target = "name")
-  @Mapping(source = "description", target = "description")
-  @Mapping(source = "image", target = "image")
-  FavouriteDTO convertRecipeToFavouriteDTO(Recipe recipe);
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "api_id", target = "api_id")
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "description", target = "description")
+    @Mapping(source = "image", target = "image")
+    FavouriteDTO convertRecipeToFavouriteDTO(Recipe recipe);
 
-  @Mapping(source = "id", target = "id")
-  @Mapping(source = "name", target = "name")
-  @Mapping(source = "location", target = "location")
-  @Mapping(source = "description", target = "description")
-  @Mapping(source = "createddate", target = "createddate")
-  EventDTO convertEventToEventDTO(Event event);
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "location", target = "location")
+    @Mapping(source = "description", target = "description")
+    @Mapping(source = "createddate", target = "createddate")
+    EventDTO convertEventToEventDTO(Event event);
+
+    @Mapping(source = "id", target = "api_id")
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "image", target = "image")
+    @Mapping(source = "unit", target = "unit")
+    Ingredient convertApiRecipeDTOIngredientToIngredient(ApiRecipeDTO.Ingredient ingredient);
+
+    @Mapping(source = "id", target = "api_id")
+    @Mapping(source = "title", target = "name")
+    @Mapping(source = "image", target = "image")
+    @Mapping(source = "servings", target = "servings")
+    //add other property mappings
+    Recipe convertApiRecipeDTOToRecipe(ApiRecipeDTO apiRecipeDTO);
 }
