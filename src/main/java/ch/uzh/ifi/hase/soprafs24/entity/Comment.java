@@ -1,17 +1,18 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
+import java.time.LocalDate;
+
 import javax.persistence.*;
 
-import ch.uzh.ifi.hase.soprafs24.constant.SD;
 import lombok.Data;
 
 @Entity
-@Table(name = "ROLES")
+@Table(name = "COMMENTS")
 @Data
-public class Role {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String comment;
 
-    @Enumerated(EnumType.STRING)
-    private SD.UserRole name;
+    private LocalDate createddate = LocalDate.now();
 }
