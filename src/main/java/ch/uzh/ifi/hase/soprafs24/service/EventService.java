@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,7 +51,9 @@ public class EventService {
     // Get detailed information about a single event
     public EventDTO findEventById(@NonNull Long eventId) {
         // Implementation stub
-        return null;
+        UserEntity authUser = securityService.getCurrentAuthenticatedUser();
+        Event event = eventRepository.findById(eventId);
+        return DTOMapper.INSTANCE.convertEventToEventDTO(event);
     }
 
     // Create a new event

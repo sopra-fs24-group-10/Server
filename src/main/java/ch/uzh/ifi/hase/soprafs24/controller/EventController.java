@@ -35,13 +35,15 @@ public class EventController {
     // Get all events for a specific user
     @GetMapping
     public ResponseEntity<Set<EventDTO>> getAllEventsOfUser() {
-        return new ResponseEntity<>(HttpStatus.OK);
+        Set<EventDTO> usersEvents = eventService.findAllEventsByUserId();
+        return new ResponseEntity<>(usersEvents, HttpStatus.OK);
     }
 
     // Get detailed information about a single event
     @GetMapping("/{eventId}")
     public ResponseEntity<EventDTO> getEventInformation(@PathVariable Long eventId) {
-        return new ResponseEntity<>(HttpStatus.OK);
+        EventDTO eventDTO = eventService.findEventById(eventId);
+        return new ResponseEntity<>(eventDTO, HttpStatus.OK);
     }
 
     // Create a new event

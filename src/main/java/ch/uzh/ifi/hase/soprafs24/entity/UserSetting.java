@@ -14,8 +14,8 @@ public class UserSetting {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private SD.Setting design;
+    private SD.Setting design = SD.Setting.DARKMODE;
 
     @Enumerated(EnumType.STRING)
-    private SD.Setting view;
+    private SD.Setting view = SD.Setting.GROUPVIEW;
 }

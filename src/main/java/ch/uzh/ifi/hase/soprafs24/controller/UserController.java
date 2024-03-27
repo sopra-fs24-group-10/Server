@@ -14,11 +14,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.uzh.ifi.hase.soprafs24.entity.Recipe;
+import ch.uzh.ifi.hase.soprafs24.entity.UserEntity;
+import ch.uzh.ifi.hase.soprafs24.entity.UserSetting;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.FavouriteDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.RecipeDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserSettingDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserUpdateDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import lombok.RequiredArgsConstructor;
 
@@ -37,34 +41,43 @@ public class UserController {
 
     @PutMapping
     public ResponseEntity<Void> updateUserProfile(@RequestBody UserUpdateDTO userUpdateDTO) {
-
-        // Stub implementation
+        // convert updateDTO into userEntity and updates the userProfile in userService
+        UserEntity userEntity = DTOMapper.INSTANCE.convertUserUpdateDTOToUserEntity(userUpdateDTO);
+        userService.updateUserProfile(userEntity);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/settings")
     public ResponseEntity<UserSettingDTO> getUserSettings() {
-        // Stub implementation
-        return new ResponseEntity<>(HttpStatus.OK);
+        // requests for user setting and sends them back
+        UserSettingDTO userSettingDTO = userService.getUserSettings();
+        return new ResponseEntity<>(userSettingDTO, HttpStatus.OK);
     }
 
     @PutMapping("/settings")
     public ResponseEntity<Void> updateUserSettings(@RequestBody UserSettingDTO userSettingsDTO) {
+        // converst dto and sends setting to updateUserSettings
+        UserSetting userSetting = DTOMapper.INSTANCE.convertUserSettingDTOToUserSetting(userSettingsDTO);
+        userService.updateUserSettings(userSetting);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/favourites")
-    public ResponseEntity<Set<FavouriteDTO>> getFavouriteRecipes() {
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Set<RecipeDTO>> getFavouriteRecipes() {
+        Set<RecipeDTO> favouriteDTOs = userService.getFavouriteRecipes();
+        return new ResponseEntity<>(favouriteDTOs, HttpStatus.OK);
     }
 
     @PostMapping("/favourites")
-    public ResponseEntity<FavouriteDTO> addRecipeToFavourites(@RequestBody RecipeDTO recipeDTO) {
+    public ResponseEntity<Void> addRecipeToFavourites(@RequestBody RecipeDTO recipeDTO) {
+        Recipe recipe = DTOMapper.INSTANCE.convertRecipeDTOToRecipe(recipeDTO);
+        userService.addRecipeToFavourites(recipe);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @DeleteMapping("/favourites/{recipeId}")
     public ResponseEntity<Void> deleteFavourite(@PathVariable Long recipeId) {
+        userService.deleteFavourite(recipeId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

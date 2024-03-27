@@ -8,6 +8,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.UserEntity;
 import ch.uzh.ifi.hase.soprafs24.repository.RoleRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.FavouriteDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.RecipeDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserSettingDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
@@ -35,7 +36,7 @@ public class UserService {
 
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
-    
+
     private final SecurityService securityService;
 
     public void createUser(@NonNull UserEntity userEntity) {
@@ -53,6 +54,9 @@ public class UserService {
         userEntity.setRoles(Collections.singleton(role));
 
         log.debug("Created Information for User: {}", userEntity);
+
+        // set default settings
+        userEntity.setSetting(new UserSetting());
         userRepository.save(userEntity); // creates the user;
     }
 
@@ -63,20 +67,29 @@ public class UserService {
     }
 
     // This function updates the profile for a given user ID
-    public void updateUserProfile(@NonNull UserEntity userEntity) {
+    public void updateUserProfile(@NonNull UserEntity userUpdateEntity) {
+
+        UserEntity authUser = securityService.getCurrentAuthenticatedUser();
+
+        authUser.setFirstname(userUpdateEntity.getFirstname());
+        authUser.setLastname(userUpdateEntity.getLastname());
+
+        // check for username change
+        if (!userUpdateEntity.getUsername().equals(authUser.getUsername())) {
+            // check if username exist on different user
+            if (userRepository.existsByUsername(userUpdateEntity.getUsername())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is taken!");
+            }
+            authUser.setUsername(userUpdateEntity.getUsername());
+        }
 
         // Set password if a new one was provided
-        if (StringUtils.isBlank(userEntity.getPassword())) {
-
-            // if no password is provided, use existing hash
-            UserEntity authUser = securityService.getCurrentAuthenticatedUser();
-            userEntity.setPassword(authUser.getPassword());
-
-        } else {
-            userEntity.setPassword(securityService.hashPassword(userEntity.getPassword()));
+        if (!StringUtils.isBlank(userUpdateEntity.getPassword())) {
+            // if password is provided, hashit
+            authUser.setPassword(securityService.hashPassword(userUpdateEntity.getPassword()));
         }
         // Update User
-        userRepository.save(userEntity);
+        userRepository.save(authUser);
     }
 
     // This function retrieves the user settings for a given user ID
@@ -88,23 +101,28 @@ public class UserService {
     // This function updates the user settings for a given user ID
     public void updateUserSettings(@NonNull UserSetting userSetting) {
         // Stub implementation
+        UserEntity authUser = securityService.getCurrentAuthenticatedUser();
+
+        // Change view and design setting
+        authUser.getSetting().setDesign(userSetting.getDesign());
+        authUser.getSetting().setView(userSetting.getView());
+
+        userRepository.save(authUser);
     }
 
     // This function retrieves the favourite recipes for a given user ID
-    public Set<FavouriteDTO> getFavouriteRecipes() {
+    public Set<RecipeDTO> getFavouriteRecipes() {
         UserEntity authUser = securityService.getCurrentAuthenticatedUser();
         return authUser.getRecipes().stream()
-                .map(recipe -> DTOMapper.INSTANCE.convertRecipeToFavouriteDTO(recipe))
+                .map(recipe -> DTOMapper.INSTANCE.convertRecipeToRecipeDTO(recipe))
                 .collect(Collectors.toSet());
     }
 
     // This function adds a favourite recipe for a given user ID
-    public Set<FavouriteDTO> addRecipeToFavourites(@NonNull Recipe recipe) {
+    public void addRecipeToFavourites(@NonNull Recipe recipe) {
         UserEntity authUser = securityService.getCurrentAuthenticatedUser();
         authUser.getRecipes().add(recipe); // use getter, do not override Set with setter!
-        return authUser.getRecipes().stream()
-                .map(r -> DTOMapper.INSTANCE.convertRecipeToFavouriteDTO(r))
-                .collect(Collectors.toSet());
+        userRepository.save(authUser);
     }
 
     // This function deletes a favourite recipe for a given user ID
@@ -114,8 +132,8 @@ public class UserService {
         // Find the recipe in the set
         Recipe recipeToRemove = authUser.getRecipes().stream()
                 .filter(r -> r.getId().equals(recipeId))
-                .findFirst().orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Favourite not found!"));
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Favourite not found!"));
 
         // Remove Recipe from Favourites
         authUser.getRecipes().remove(recipeToRemove);

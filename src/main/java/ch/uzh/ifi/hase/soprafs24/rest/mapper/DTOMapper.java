@@ -7,9 +7,11 @@ import ch.uzh.ifi.hase.soprafs24.entity.UserEntity;
 import ch.uzh.ifi.hase.soprafs24.entity.UserSetting;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.EventDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.FavouriteDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.RecipeDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.RegisterDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserSettingDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserUpdateDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.external.ApiRecipeDTO;
 
 import org.mapstruct.*;
@@ -43,16 +45,27 @@ public interface DTOMapper {
     @Mapping(source = "lastname", target = "lastname")
     UserDTO convertUserEntityToUserDTO(UserEntity userEntity);
 
+    // updateDTO into userEntitiy
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "firstname", target = "firstname")
+    @Mapping(source = "lastname", target = "lastname")
+    @Mapping(source = "password", target = "password")
+    UserEntity convertUserUpdateDTOToUserEntity(UserUpdateDTO userUpdateDTO);
+
     @Mapping(source = "design", target = "design")
     @Mapping(source = "view", target = "view")
     UserSettingDTO convertUserSettingToUserSettingDTO(UserSetting userSetting);
 
+    @Mapping(source = "design", target = "design")
+    @Mapping(source = "view", target = "view")
+    UserSetting convertUserSettingDTOToUserSetting(UserSettingDTO userSettingDTO);
+
     @Mapping(source = "id", target = "id")
     @Mapping(source = "api_id", target = "api_id")
     @Mapping(source = "name", target = "name")
-    @Mapping(source = "description", target = "description")
     @Mapping(source = "image", target = "image")
-    FavouriteDTO convertRecipeToFavouriteDTO(Recipe recipe);
+    @Mapping(source = "instructions", target = "instructions")
+    Recipe convertRecipeDTOToRecipe(RecipeDTO recipeDTO);
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "name", target = "name")
@@ -60,6 +73,7 @@ public interface DTOMapper {
     @Mapping(source = "description", target = "description")
     @Mapping(source = "createddate", target = "createddate")
     EventDTO convertEventToEventDTO(Event event);
+
 
     @Mapping(source = "id", target = "api_id")
     @Mapping(source = "name", target = "name")
