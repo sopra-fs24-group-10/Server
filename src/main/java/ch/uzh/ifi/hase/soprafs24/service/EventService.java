@@ -11,13 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver;
 
+import ch.uzh.ifi.hase.soprafs24.entity.Assignment;
 import ch.uzh.ifi.hase.soprafs24.entity.Comment;
 import ch.uzh.ifi.hase.soprafs24.entity.Event;
 import ch.uzh.ifi.hase.soprafs24.entity.Ingredient;
 import ch.uzh.ifi.hase.soprafs24.entity.Recipe;
 import ch.uzh.ifi.hase.soprafs24.entity.UserEntity;
+import ch.uzh.ifi.hase.soprafs24.repository.AssignmentRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.EventRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AssignmentDTO;
@@ -39,6 +40,7 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final AssignmentRepository assignmentRepository;
 
     private final SecurityService securityService;
 
@@ -52,30 +54,27 @@ public class EventService {
 
     // Get detailed information about a single event
     public EventDTO findEventById(@NonNull Long eventId) {
-        // Implementation stub
         UserEntity authUser = securityService.getCurrentAuthenticatedUser();
         // Find the event in the set
-        Event event = authUser.getEvents().stream()
-                .filter(e -> e.getId().equals(eventId)).findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found!"));
+        Event event = getEventIfParticipant(eventId, authUser);
         return DTOMapper.INSTANCE.convertEventToEventDTO(event);
     }
 
     // Create a new event
-    public EventDTO createEvent(@NonNull Event event) {
+    public void createEvent(@NonNull Event event) {
         eventRepository.save(event);
-        return DTOMapper.INSTANCE.convertEventToEventDTO(event);
     }
 
     // Delete an event
     public void deleteEvent(@NonNull Long eventId) {
-        Event event = isParticipantOfEvent(eventId);
-        eventRepository.delete(event); // is that correct???
+        Event event = getEventIfHost(eventId);
+        eventRepository.delete(event); 
     }
 
     // Get a list of all participants for an event
     public Set<UserDTO> findAllParticipantsByEventId(@NonNull Long eventId) {
-        Event event = isParticipantOfEvent(eventId);
+        UserEntity authUser = securityService.getCurrentAuthenticatedUser();
+        Event event = getEventIfParticipant(eventId, authUser);
         return event.getParticipants().stream()
                 .map(participant -> DTOMapper.INSTANCE.convertUserEntityToUserDTO(participant))
                 .collect(Collectors.toSet());
@@ -83,12 +82,12 @@ public class EventService {
 
     // Add a participant to an event
     public void addParticipantToEvent(@NonNull Long eventId, @NonNull UserEntity userEntity) {
-        Event event = isHostOfEvent(eventId);
+        Event event = getEventIfHost(eventId);
 
         // Find the user
         UserEntity userToAdd = userRepository.findById(userEntity.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
- 
+
         // Add Participant to event
         event.getParticipants().add(userToAdd);
         eventRepository.save(event);
@@ -96,7 +95,7 @@ public class EventService {
 
     // Remove a participant from an event
     public void removeParticipantFromEvent(@NonNull Long eventId, @NonNull Long userId) {
-        Event event = isHostOfEvent(eventId);
+        Event event = getEventIfHost(eventId);
 
         // Find the user in the set
         UserEntity userToDelete = event.getParticipants().stream()
@@ -110,8 +109,13 @@ public class EventService {
 
     // Get recipes associated with an event
     public Set<RecipeDTO> findAllRecipesByEventId(@NonNull Long eventId) {
-        Event event = isParticipantOfEvent(eventId);
-        return null;
+        UserEntity authUser = securityService.getCurrentAuthenticatedUser();
+        Event event = getEventIfParticipant(eventId, authUser);
+        Set<Assignment> eventAssignments = assignmentRepository.findByEvent(event).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Assignment for event not found!"));
+        return eventAssignments.stream()
+                .map(assignment -> assignment.getRecipe())
+                .map(recipe -> DTOMapper.INSTANCE.convertRecipeToRecipeDTO(recipe))
+                .collect(Collectors.toSet());
     }
 
     // Add a recipe to an event
@@ -188,22 +192,26 @@ public class EventService {
         // Implementation stub
     }
 
-    public Event isParticipantOfEvent(@NonNull Long eventId) {
-        UserEntity authUser = securityService.getCurrentAuthenticatedUser();
-        Event event = authUser.getEvents().stream()
-                .filter(e -> e.getId().equals(eventId)).findFirst()
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found or User not found!"));
+    public Event getEventIfParticipant(@NonNull Long eventId, @NonNull UserEntity userEntity) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found!"));
+
+        event.getParticipants().stream()
+                .filter(user -> user.equals(userEntity)).findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not allowed!"));
+
         return event;
     }
 
-    public Event isHostOfEvent(@NonNull Long eventId) {
+    public Event getEventIfHost(@NonNull Long eventId) {
         UserEntity authUser = securityService.getCurrentAuthenticatedUser();
-        Event event = authUser.getEvents().stream()
-                .filter(e -> e.getId().equals(eventId)).findFirst()
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found or User not found!"));
-        // how handle host request
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found!"));
+
+        if (!event.isHost(authUser)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Insufficient permission!");
+        }
+
         return event;
     }
 }

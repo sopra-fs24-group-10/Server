@@ -49,9 +49,9 @@ public class EventController {
 
     // Create a new event
     @PostMapping
-    public ResponseEntity<EventDTO> createEvent(@Valid @RequestBody EventDTO eventDTO) {
-        EventDTO createdEventDTO = eventService.createEvent(DTOMapper.INSTANCE.convertEventDTOToEvent(eventDTO));
-        return new ResponseEntity<>(createdEventDTO, HttpStatus.CREATED);
+    public ResponseEntity<Void> createEvent(@Valid @RequestBody EventDTO eventDTO) {
+        eventService.createEvent(DTOMapper.INSTANCE.convertEventDTOToEvent(eventDTO));
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     // Delete an event
@@ -71,12 +71,13 @@ public class EventController {
     // Add a participant to an event
     @PostMapping("/{eventId}/participants")
     public ResponseEntity<Void> addParticipantToEvent(@PathVariable Long eventId, @Valid @RequestBody UserDTO userDTO) {
+        eventService.addParticipantToEvent(eventId, DTOMapper.INSTANCE.convertUserDTOToUserEntity(userDTO));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     // Remove a participant from an event
     @DeleteMapping("/{eventId}/participants/{userId}")
-    public ResponseEntity<Void> removeParticipant(@PathVariable Long eventId, @PathVariable Long userId) {
+    public ResponseEntity<Void> removeParticipantOfEvent(@PathVariable Long eventId, @PathVariable Long userId) {
         eventService.removeParticipantFromEvent(eventId, userId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -96,7 +97,7 @@ public class EventController {
 
     // Delete a wrongly added recipe from an event
     @DeleteMapping("/{eventId}/recipes/{recipeId}")
-    public ResponseEntity<Void> deleteWronglyAddedRecipeFromEvent(@PathVariable Long eventId, @PathVariable Long recipeId) {
+    public ResponseEntity<Void> deleteRecipeOfEvent(@PathVariable Long eventId, @PathVariable Long recipeId) {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

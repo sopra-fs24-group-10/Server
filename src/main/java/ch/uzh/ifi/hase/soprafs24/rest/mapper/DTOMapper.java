@@ -46,6 +46,12 @@ public interface DTOMapper {
     @Mapping(source = "lastname", target = "lastname")
     UserDTO convertUserEntityToUserDTO(UserEntity userEntity);
 
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "firstname", target = "firstname")
+    @Mapping(source = "lastname", target = "lastname")
+    UserEntity convertUserDTOToUserEntity(UserDTO userDTO);
+
     @Mapping(source = "username", target = "username")
     @Mapping(source = "firstname", target = "firstname")
     @Mapping(source = "lastname", target = "lastname")
