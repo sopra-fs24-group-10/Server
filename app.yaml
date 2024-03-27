@@ -3,3 +3,8 @@
 
 runtime: java17
 instance_class: F2
+
+env_variables:
+  JWT_SECRET: "your_jwt_secret_placeholder"
+  SPOONACULAR_API_KEY: "your_external_api_key_placeholder"
+

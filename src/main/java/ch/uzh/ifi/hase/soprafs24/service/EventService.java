@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,7 @@ public class EventService {
     private final AssignmentRepository assignmentRepository;
 
     private final SecurityService securityService;
+    private final ExternalApiService externalApiService;
 
     // Get all events for a specific user
     public Set<EventDTO> findAllEvents() {
@@ -68,7 +70,7 @@ public class EventService {
     // Delete an event
     public void deleteEvent(@NonNull Long eventId) {
         Event event = getEventIfHost(eventId);
-        eventRepository.delete(event); 
+        eventRepository.delete(event);
     }
 
     // Get a list of all participants for an event
@@ -111,7 +113,8 @@ public class EventService {
     public Set<RecipeDTO> findAllRecipesByEventId(@NonNull Long eventId) {
         UserEntity authUser = securityService.getCurrentAuthenticatedUser();
         Event event = getEventIfParticipant(eventId, authUser);
-        Set<Assignment> eventAssignments = assignmentRepository.findAllByEvent(event).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Assignment for event not found!"));
+        Set<Assignment> eventAssignments = assignmentRepository.findAllByEvent(event).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Assignment for event not found!"));
         return eventAssignments.stream()
                 .map(assignment -> assignment.getRecipe())
                 .map(recipe -> DTOMapper.INSTANCE.convertRecipeToRecipeDTO(recipe))
@@ -121,6 +124,18 @@ public class EventService {
     // Add a recipe to an event
     public RecipeDTO addRecipeToEvent(@NonNull Long eventId, @NonNull Recipe recipe) {
         // Implementation stub
+        // da mümmer s recipe /ingredients / instructions vo extern lade mittels em
+        // externalApiService! eppe so:
+        // Pair<Recipe, Set<Ingredient>> recipeInformation =
+        // externalApiService.fetchRecipeInformation(eventId);
+        // d api_id bruchemer, mues also vom recipeDTO immer deher cho
+        // han gseh im recipeDTO isch shco id als required (wieso???) immer kommentiere
+        // so sache, ich glaube für get Favourites
+        // wenn jz aber api_id au pflicht wird gits es problem will vermuetlich nöd
+        // beides imemr chasch provide, mümmer aluege
+        // Eventuell splitte i zwei verschiedeni DTOS - to discuss.
+        // Achtung mir müend luege dass mir ned dopplet ingredients oder recipes added (gaht nöd würklich i de DB, mümmer aber trotzdem prüefe zum de error verhindere),
+        // chasch gern mal umespille und probiere, pls die komentär stah lah
         return null;
     }
 
@@ -193,17 +208,19 @@ public class EventService {
     }
 
     public Event getEventIfParticipant(@NonNull Long eventId, @NonNull UserEntity userEntity) {
+
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found!"));
 
-        event.getParticipants().stream()
-                .filter(user -> user.equals(userEntity)).findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not allowed!"));
+        if (!event.isParticipant(userEntity)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not allowed!");
+        }
 
         return event;
     }
 
     public Event getEventIfHost(@NonNull Long eventId) {
+
         UserEntity authUser = securityService.getCurrentAuthenticatedUser();
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found!"));

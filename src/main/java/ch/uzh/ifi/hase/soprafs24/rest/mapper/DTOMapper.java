@@ -13,6 +13,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.RegisterDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserSettingDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserUpdateDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.external.ApiInstructionDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.external.ApiRecipeDTO;
 
 import org.mapstruct.*;
@@ -105,6 +106,11 @@ public interface DTOMapper {
     @Mapping(source = "title", target = "name")
     @Mapping(source = "image", target = "image")
     @Mapping(source = "servings", target = "servings")
-    // add other property mappings
+    // add other property mappings if needed
     Recipe convertApiRecipeDTOToRecipe(ApiRecipeDTO apiRecipeDTO);
+
+    @Mapping(source = "number", target = "step")
+    @Mapping(source = "step", target = "instruction")
+    // add other property mappings if needed
+    Instruction convertApiInstructionDTOToInstruction(ApiInstructionDTO.Instruction instruction);
 }

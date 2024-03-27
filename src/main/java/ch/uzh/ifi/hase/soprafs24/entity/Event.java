@@ -6,6 +6,7 @@ import java.util.Set;
 
 import javax.persistence.*;
 import lombok.Data;
+import lombok.NonNull;
 
 @Entity
 @Table(name = "EVENTS")
@@ -32,7 +33,12 @@ public class Event {
     private Set<UserEntity> participants = new HashSet<>();
 
     // To check if a User is Host of Event
-    public Boolean isHost(UserEntity userEntity) {
+    public Boolean isHost(@NonNull UserEntity userEntity) {
         return this.host.equals(userEntity);
+    }
+
+    // To check if a User is Participant of Event
+    public Boolean isParticipant(@NonNull UserEntity userEntity) {
+        return this.participants.contains(userEntity);
     }
 }
