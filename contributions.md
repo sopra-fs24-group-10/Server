@@ -2,10 +2,10 @@
 ## Week 1
 ### 27.03.2024
 #### Commits
-- 
+- https://github.com/sopra-fs24-group-10/Server/commit/baddb006a7275a079f9359a6bf8d9255fd853550
 
 #### Issues worked on:
-- 
+- https://github.com/sopra-fs24-group-10/Server/issues/19
 - 
 
 
