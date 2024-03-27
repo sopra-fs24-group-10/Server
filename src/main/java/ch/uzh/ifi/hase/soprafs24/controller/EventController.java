@@ -22,6 +22,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.EventDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.IngredientDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.RecipeDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.EventService;
 import lombok.RequiredArgsConstructor;
 
@@ -49,37 +50,42 @@ public class EventController {
     // Create a new event
     @PostMapping
     public ResponseEntity<EventDTO> createEvent(@Valid @RequestBody EventDTO eventDTO) {
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        EventDTO createdEventDTO = eventService.createEvent(DTOMapper.INSTANCE.convertEventDTOToEvent(eventDTO));
+        return new ResponseEntity<>(createdEventDTO, HttpStatus.CREATED);
     }
 
     // Delete an event
     @DeleteMapping("/{eventId}")
     public ResponseEntity<Void> deleteEvent(@PathVariable Long eventId) {
+        eventService.deleteEvent(eventId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     // Get a list of all participants for an event
     @GetMapping("/{eventId}/participants")
     public ResponseEntity<Set<UserDTO>> getAllParticipantsOfEvent(@PathVariable Long eventId) {
-        return new ResponseEntity<>(HttpStatus.OK);
+        Set<UserDTO> participants = eventService.findAllParticipantsByEventId(eventId);
+        return new ResponseEntity<>(participants, HttpStatus.OK);
     }
 
     // Add a participant to an event
     @PostMapping("/{eventId}/participants")
-    public ResponseEntity<UserDTO> addParticipantToEvent(@PathVariable Long eventId, @Valid @RequestBody UserDTO userDTO) {
+    public ResponseEntity<Void> addParticipantToEvent(@PathVariable Long eventId, @Valid @RequestBody UserDTO userDTO) {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     // Remove a participant from an event
     @DeleteMapping("/{eventId}/participants/{userId}")
     public ResponseEntity<Void> removeParticipant(@PathVariable Long eventId, @PathVariable Long userId) {
+        eventService.removeParticipantFromEvent(eventId, userId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     // Get recipes associated with an event
     @GetMapping("/{eventId}/recipes")
     public ResponseEntity<Set<RecipeDTO>> getRecipesOfEvent(@PathVariable Long eventId) {
-        return new ResponseEntity<>(HttpStatus.OK);
+        Set<RecipeDTO> eventsRecipes = eventService.findAllRecipesByEventId(eventId);
+        return new ResponseEntity<>(eventsRecipes, HttpStatus.OK);
     }
 
     // Add a recipe to an event

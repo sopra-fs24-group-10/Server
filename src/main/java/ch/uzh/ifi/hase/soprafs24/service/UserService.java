@@ -122,8 +122,12 @@ public class UserService {
     // This function adds a favourite recipe for a given user ID
     public void addRecipeToFavourites(@NonNull Recipe recipe) {
         UserEntity authUser = securityService.getCurrentAuthenticatedUser();
+
+        // Find the recipe with id
         Recipe recipeToAdd = recipeRepository.findById(recipe.getId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found!"));
+        
+        // Add recipe to Favourites
         authUser.getRecipes().add(recipeToAdd);
         userRepository.save(authUser);
     }

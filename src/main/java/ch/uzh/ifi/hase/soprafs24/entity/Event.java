@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 import lombok.Data;
 
@@ -16,7 +17,10 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Eventname is required!")
     private String name;
+
+    @NotBlank(message = "Location is required!")
     private String location;
     private String description;
     private LocalDate createddate = LocalDate.now();

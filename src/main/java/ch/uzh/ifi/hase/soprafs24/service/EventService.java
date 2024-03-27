@@ -54,43 +54,63 @@ public class EventService {
     public EventDTO findEventById(@NonNull Long eventId) {
         // Implementation stub
         UserEntity authUser = securityService.getCurrentAuthenticatedUser();
+        // Find the event in the set
         Event event = authUser.getEvents().stream()
-            .filter(e -> e.getId().equals(eventId)).findFirst()
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found!"));
+                .filter(e -> e.getId().equals(eventId)).findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found!"));
         return DTOMapper.INSTANCE.convertEventToEventDTO(event);
     }
 
     // Create a new event
     public EventDTO createEvent(@NonNull Event event) {
-        // Implementation stub
-        return null;
+        eventRepository.save(event);
+        return DTOMapper.INSTANCE.convertEventToEventDTO(event);
     }
 
     // Delete an event
     public void deleteEvent(@NonNull Long eventId) {
-        // Implementation stub
+        Event event = isParticipantOfEvent(eventId);
+        eventRepository.delete(event); // is that correct???
     }
 
     // Get a list of all participants for an event
     public Set<UserDTO> findAllParticipantsByEventId(@NonNull Long eventId) {
-        // Implementation stub
-        return null;
+        Event event = isParticipantOfEvent(eventId);
+        return event.getParticipants().stream()
+                .map(participant -> DTOMapper.INSTANCE.convertUserEntityToUserDTO(participant))
+                .collect(Collectors.toSet());
     }
 
     // Add a participant to an event
-    public UserDTO addParticipantToEvent(@NonNull Long eventId, @NonNull UserEntity userEntity) {
-        // Implementation stub
-        return null;
+    public void addParticipantToEvent(@NonNull Long eventId, @NonNull UserEntity userEntity) {
+        Event event = isHostOfEvent(eventId);
+
+        // Find the user
+        UserEntity userToAdd = userRepository.findById(userEntity.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!"));
+ 
+        // Add Participant to event
+        event.getParticipants().add(userToAdd);
+        eventRepository.save(event);
     }
 
     // Remove a participant from an event
     public void removeParticipantFromEvent(@NonNull Long eventId, @NonNull Long userId) {
-        // Implementation stub
+        Event event = isHostOfEvent(eventId);
+
+        // Find the user in the set
+        UserEntity userToDelete = event.getParticipants().stream()
+                .filter(user -> user.getId().equals(userId)).findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Participant not found!"));
+
+        // Remove User from Participants
+        event.getParticipants().remove(userToDelete);
+        eventRepository.save(event);
     }
 
     // Get recipes associated with an event
     public Set<RecipeDTO> findAllRecipesByEventId(@NonNull Long eventId) {
-        // Implementation stub
+        Event event = isParticipantOfEvent(eventId);
         return null;
     }
 
@@ -142,7 +162,8 @@ public class EventService {
     // Get a list of ingredient assignments for users in an event
     public Set<AssignmentDTO> findAllIngredientAssignmentsByEventId(@NonNull Long eventId) {
         // Implementation stub
-        //isch die methode würklich nötig? wo isch de usecase? mer chönted au eifach nur die undedrah also pro user????
+        // isch die methode würklich nötig? wo isch de usecase? mer chönted au eifach
+        // nur die undedrah also pro user????
         return null;
     }
 
@@ -156,7 +177,8 @@ public class EventService {
     public AssignmentDTO assignIngredientToUser(@NonNull Long eventId, @NonNull Long ingredientId,
             @NonNull UserEntity userEntity) {
         // Implementation stub
-        // wemmer eppis returne? wieso ned void? controller returned void...? also da doch eig au?
+        // wemmer eppis returne? wieso ned void? controller returned void...? also da
+        // doch eig au?
         return null;
     }
 
@@ -164,5 +186,24 @@ public class EventService {
     public void deleteAssignedIngredientFromUser(@NonNull Long eventId, @NonNull Long ingredientId,
             @NonNull Long userId) {
         // Implementation stub
+    }
+
+    public Event isParticipantOfEvent(@NonNull Long eventId) {
+        UserEntity authUser = securityService.getCurrentAuthenticatedUser();
+        Event event = authUser.getEvents().stream()
+                .filter(e -> e.getId().equals(eventId)).findFirst()
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found or User not found!"));
+        return event;
+    }
+
+    public Event isHostOfEvent(@NonNull Long eventId) {
+        UserEntity authUser = securityService.getCurrentAuthenticatedUser();
+        Event event = authUser.getEvents().stream()
+                .filter(e -> e.getId().equals(eventId)).findFirst()
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found or User not found!"));
+        // how handle host request
+        return event;
     }
 }

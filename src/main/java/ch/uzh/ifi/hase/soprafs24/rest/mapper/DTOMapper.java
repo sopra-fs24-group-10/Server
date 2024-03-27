@@ -82,6 +82,13 @@ public interface DTOMapper {
     @Mapping(source = "createddate", target = "createddate")
     EventDTO convertEventToEventDTO(Event event);
 
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "location", target = "location")
+    @Mapping(source = "description", target = "description")
+    @Mapping(source = "createddate", target = "createddate")
+    Event convertEventDTOToEvent(EventDTO eventDTO);
+
     @Mapping(source = "id", target = "api_id")
     @Mapping(source = "name", target = "name")
     @Mapping(source = "image", target = "image")
