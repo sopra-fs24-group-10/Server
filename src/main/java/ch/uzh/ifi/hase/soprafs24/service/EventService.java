@@ -8,7 +8,10 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Comment;
 import ch.uzh.ifi.hase.soprafs24.entity.Event;
@@ -40,7 +43,7 @@ public class EventService {
     private final SecurityService securityService;
 
     // Get all events for a specific user
-    public Set<EventDTO> findAllEventsByUserId() {
+    public Set<EventDTO> findAllEvents() {
         UserEntity authUser = securityService.getCurrentAuthenticatedUser();
         return authUser.getEvents().stream()
                 .map(event -> DTOMapper.INSTANCE.convertEventToEventDTO(event))
@@ -51,7 +54,9 @@ public class EventService {
     public EventDTO findEventById(@NonNull Long eventId) {
         // Implementation stub
         UserEntity authUser = securityService.getCurrentAuthenticatedUser();
-        Event event = eventRepository.findById(eventId);
+        Event event = authUser.getEvents().stream()
+            .filter(e -> e.getId().equals(eventId)).findFirst()
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found!"));
         return DTOMapper.INSTANCE.convertEventToEventDTO(event);
     }
 

@@ -35,7 +35,7 @@ public class EventController {
     // Get all events for a specific user
     @GetMapping
     public ResponseEntity<Set<EventDTO>> getAllEventsOfUser() {
-        Set<EventDTO> usersEvents = eventService.findAllEventsByUserId();
+        Set<EventDTO> usersEvents = eventService.findAllEvents();
         return new ResponseEntity<>(usersEvents, HttpStatus.OK);
     }
 
