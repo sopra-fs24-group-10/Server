@@ -1,6 +1,9 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
 import java.util.Set;
+
+import javax.validation.constraints.NotNull;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +11,7 @@ import lombok.Setter;
 @Setter
 public class RecipeDTO {
 
+    @NotNull(message = "Recipe id is required!")
     private Long id;
     private Long api_id;
     private String name;

@@ -2,6 +2,8 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 
 import java.util.Set;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +41,7 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> updateUserProfile(@RequestBody UserUpdateDTO userUpdateDTO) {
+    public ResponseEntity<Void> updateUserProfile(@Valid @RequestBody UserUpdateDTO userUpdateDTO) {
         // convert updateDTO into userEntity and updates the userProfile in userService
         UserEntity userEntity = DTOMapper.INSTANCE.convertUserUpdateDTOToUserEntity(userUpdateDTO);
         userService.updateUserProfile(userEntity);
@@ -54,7 +56,7 @@ public class UserController {
     }
 
     @PutMapping("/settings")
-    public ResponseEntity<Void> updateUserSettings(@RequestBody UserSettingDTO userSettingsDTO) {
+    public ResponseEntity<Void> updateUserSettings(@Valid @RequestBody UserSettingDTO userSettingsDTO) {
         // converst dto and sends setting to updateUserSettings
         UserSetting userSetting = DTOMapper.INSTANCE.convertUserSettingDTOToUserSetting(userSettingsDTO);
         userService.updateUserSettings(userSetting);
@@ -68,7 +70,7 @@ public class UserController {
     }
 
     @PostMapping("/favourites")
-    public ResponseEntity<Void> addRecipeToFavourites(@RequestBody RecipeDTO recipeDTO) {
+    public ResponseEntity<Void> addRecipeToFavourites(@Valid @RequestBody RecipeDTO recipeDTO) {
         Recipe recipe = DTOMapper.INSTANCE.convertRecipeDTOToRecipe(recipeDTO);
         userService.addRecipeToFavourites(recipe);
         return new ResponseEntity<>(HttpStatus.CREATED);

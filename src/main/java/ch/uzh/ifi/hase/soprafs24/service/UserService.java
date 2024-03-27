@@ -5,6 +5,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.Recipe;
 import ch.uzh.ifi.hase.soprafs24.entity.Role;
 import ch.uzh.ifi.hase.soprafs24.entity.UserSetting;
 import ch.uzh.ifi.hase.soprafs24.entity.UserEntity;
+import ch.uzh.ifi.hase.soprafs24.repository.RecipeRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.RoleRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.RecipeDTO;
@@ -35,6 +36,7 @@ public class UserService {
 
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final RecipeRepository recipeRepository;
 
     private final SecurityService securityService;
 
@@ -120,7 +122,9 @@ public class UserService {
     // This function adds a favourite recipe for a given user ID
     public void addRecipeToFavourites(@NonNull Recipe recipe) {
         UserEntity authUser = securityService.getCurrentAuthenticatedUser();
-        authUser.getRecipes().add(recipe); // use getter, do not override Set with setter!
+        Recipe recipeToAdd = recipeRepository.findById(recipe.getId())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found!"));
+        authUser.getRecipes().add(recipeToAdd);
         userRepository.save(authUser);
     }
 
