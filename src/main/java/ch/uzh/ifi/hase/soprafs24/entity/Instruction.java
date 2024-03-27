@@ -17,5 +17,5 @@ public class Instruction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private int step;
-    private String description;
+    private String instruction;
 }

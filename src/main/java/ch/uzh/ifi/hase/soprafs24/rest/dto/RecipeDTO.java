@@ -1,8 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
 import java.util.Set;
-
-import ch.uzh.ifi.hase.soprafs24.entity.Instruction;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,5 +15,5 @@ public class RecipeDTO {
     private String image;
     private float rating;
     private int rating_count;
-    private Set<Instruction> instructions;
+    private Set<InstructionDTO> instructions;
 }
