@@ -111,7 +111,7 @@ public class EventService {
     public Set<RecipeDTO> findAllRecipesByEventId(@NonNull Long eventId) {
         UserEntity authUser = securityService.getCurrentAuthenticatedUser();
         Event event = getEventIfParticipant(eventId, authUser);
-        Set<Assignment> eventAssignments = assignmentRepository.findByEvent(event).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Assignment for event not found!"));
+        Set<Assignment> eventAssignments = assignmentRepository.findAllByEvent(event).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Assignment for event not found!"));
         return eventAssignments.stream()
                 .map(assignment -> assignment.getRecipe())
                 .map(recipe -> DTOMapper.INSTANCE.convertRecipeToRecipeDTO(recipe))

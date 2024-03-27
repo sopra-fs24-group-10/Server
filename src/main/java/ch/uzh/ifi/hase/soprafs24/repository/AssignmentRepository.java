@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 @Repository("assignmentRepository")
 public interface AssignmentRepository extends JpaRepository<Assignment, Integer> {
     Optional<Assignment> findById(Long id);
-    Optional<Set<Assignment>> findByEventAndUser(Event event, UserEntity user);
-    Optional<Set<Assignment>> findByEvent(Event event);
+    Optional<Set<Assignment>> findAllByEventAndUser(Event event, UserEntity user);
+    Optional<Set<Assignment>> findAllByEvent(Event event);
     Optional<Assignment> findByEventAndUserAndIngredient(Event event, UserEntity user, Ingredient ingredient);
 }
