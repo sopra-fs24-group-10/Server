@@ -20,3 +20,11 @@
 #### Issues worked on:
 - https://github.com/sopra-fs24-group-10/Server/issues/24
 - https://github.com/sopra-fs24-group-10/Server/issues/22
+
+
+### 27.03.2024
+#### Commits
+- https://github.com/sopra-fs24-group-10/Server/commit/8adb0af6918dc26b28438b2b30d64846853e1eba
+
+#### Issues worked on:
+- https://github.com/sopra-fs24-group-10/Server/issues/36
