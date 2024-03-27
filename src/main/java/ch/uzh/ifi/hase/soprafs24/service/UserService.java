@@ -7,7 +7,6 @@ import ch.uzh.ifi.hase.soprafs24.entity.UserSetting;
 import ch.uzh.ifi.hase.soprafs24.entity.UserEntity;
 import ch.uzh.ifi.hase.soprafs24.repository.RoleRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.FavouriteDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.RecipeDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserSettingDTO;
@@ -131,8 +130,7 @@ public class UserService {
         UserEntity authUser = securityService.getCurrentAuthenticatedUser();
         // Find the recipe in the set
         Recipe recipeToRemove = authUser.getRecipes().stream()
-                .filter(r -> r.getId().equals(recipeId))
-                .findFirst()
+                .filter(recipe -> recipe.getId().equals(recipeId)).findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Favourite not found!"));
 
         // Remove Recipe from Favourites

@@ -22,11 +22,11 @@ public class Event {
     private LocalDate createddate = LocalDate.now();
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "comment_id", referencedColumnName = "id")
+    @JoinColumn(name = "event_id", referencedColumnName = "id")
     private Set<Comment> comments = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "host_id", referencedColumnName = "id")
     private UserEntity host;
 
     @ManyToMany(mappedBy = "events", fetch = FetchType.LAZY)

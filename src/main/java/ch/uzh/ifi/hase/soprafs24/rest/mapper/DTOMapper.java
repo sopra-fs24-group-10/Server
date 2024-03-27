@@ -6,7 +6,6 @@ import ch.uzh.ifi.hase.soprafs24.entity.Recipe;
 import ch.uzh.ifi.hase.soprafs24.entity.UserEntity;
 import ch.uzh.ifi.hase.soprafs24.entity.UserSetting;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.EventDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.FavouriteDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.RecipeDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.RegisterDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserDTO;
@@ -68,12 +67,18 @@ public interface DTOMapper {
     Recipe convertRecipeDTOToRecipe(RecipeDTO recipeDTO);
 
     @Mapping(source = "id", target = "id")
+    @Mapping(source = "api_id", target = "api_id")
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "image", target = "image")
+    @Mapping(source = "instructions", target = "instructions")
+    RecipeDTO convertRecipeToRecipeDTO(Recipe recipeDTO);
+
+    @Mapping(source = "id", target = "id")
     @Mapping(source = "name", target = "name")
     @Mapping(source = "location", target = "location")
     @Mapping(source = "description", target = "description")
     @Mapping(source = "createddate", target = "createddate")
     EventDTO convertEventToEventDTO(Event event);
-
 
     @Mapping(source = "id", target = "api_id")
     @Mapping(source = "name", target = "name")

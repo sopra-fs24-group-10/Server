@@ -24,8 +24,7 @@ public class Recipe {
     private float rating;
     private int rating_count;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "instruction_id", referencedColumnName = "id")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "recipe_id", referencedColumnName = "id")
     private Set<Instruction> instructions = new HashSet<>();
-
 }
