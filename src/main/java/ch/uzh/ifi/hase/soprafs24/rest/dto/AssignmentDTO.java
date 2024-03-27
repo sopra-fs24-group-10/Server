@@ -7,5 +7,4 @@ public class AssignmentDTO {
     private Long ingredient_id;
     private Double quantity;
     private Long user_id;
-
 }
